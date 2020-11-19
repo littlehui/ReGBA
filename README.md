@@ -1,5 +1,6 @@
 # ReGBA_Cheat
-ReGBA (based on gbsp) cheat version. GBA模拟器中文版，支持金手指
+ReGBA (based on gbsp) cheat version. GBA模拟器中文版，支持金手指,震动,滤镜。
+PS:开启双倍硬件渲染，网格扫描线。显示效果无线接近实机。
 
 ## 来源
 
