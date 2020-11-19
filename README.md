@@ -1,10 +1,9 @@
 # ReGBA_Cheat
-ReGBA (based on gbsp) cheat version. GBA模拟器中文版，支持金手指,震动,滤镜。
-PS:开启双倍硬件渲染，网格扫描线。显示效果无线接近实机。
+ReGBA (based on gbsp) cheat version. GBA模拟器中文版，支持金手指
 
 ## 来源
 
-本版本是基于[CynricXu的7.0版本](https://github.com/CynricXu/ReGBA_Cheat) 增加 [jdgleaver的](https://github.com/jdgleaver/ReGBA)的滤镜部分代码合并而成。感谢他们两位。
+本版本是基于(CynricXu的7.0版本)[https://github.com/CynricXu/ReGBA_Cheat]增加 (jdgleaver的)[https://github.com/jdgleaver/ReGBA]的滤镜部分代码合并而成。感谢他们两位。
 
 ## 使用说明
 此模拟器在基于开源ReGBA模拟器下修改，目前v7.0版本最多可添加100个金手指
@@ -66,8 +65,8 @@ vba编码地址部分第一位是要写入的位数，0表示写入1byte,1表示
 注意：每一个金手指之间要留有一行空格（V5.0+已去掉这个限制），如果有不明白可以查看示例文件
 
 
-更新内容：
-V8.0~20201116:
+## 更新内容：
+### V8.0~20201116:
 1. 追加快进音频配置，减少快进爆音。感谢  jdgleaver
 2. 图像显示 双倍硬件渲染，双倍硬件渲染，竖扫描线、双倍硬件渲染，横扫描线、双倍硬件渲染，网格扫描线、硬件渲染，双倍拉伸 几种渲染方式。 感谢 jdgleaver
 3. 追加颜色校正开关。感谢 jdgleaver
