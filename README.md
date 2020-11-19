@@ -3,7 +3,7 @@ ReGBA (based on gbsp) cheat version. GBA模拟器中文版，支持金手指
 
 ## 来源
 
-本版本是基于(CynricXu的7.0版本)[https://github.com/CynricXu/ReGBA_Cheat]增加 (jdgleaver的)[https://github.com/jdgleaver/ReGBA]的滤镜部分代码合并而成。感谢他们两位。
+本版本是基于[CynricXu的7.0版本](https://github.com/CynricXu/ReGBA_Cheat) 增加 [jdgleaver的](https://github.com/jdgleaver/ReGBA)的滤镜部分代码合并而成。感谢他们两位。
 
 ## 使用说明
 此模拟器在基于开源ReGBA模拟器下修改，目前v7.0版本最多可添加100个金手指
