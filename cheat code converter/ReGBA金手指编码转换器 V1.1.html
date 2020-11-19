@@ -1,0 +1,720 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>ReGBA金手指编码转换器 V1.1</title>
+</head>
+
+<body>
+<div style="text-align: center;">
+	<h1>ReGBA金手指编码转换器 V1.1 By Cynric</h1>
+</div>
+<div style="
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+">
+    <div id="srcbox" style="
+    border: 1px solid;
+    width: 30%;
+    height: 90%;
+">
+        <textarea id="srcEditBox" style="margin: 0px;width: 100%;height: 100%;" ></textarea>
+    </div>
+    <div id="control" style="
+    display: flex;
+    justify-content: space-around;
+    width: 30%;
+    height: 90%;
+    border: 1px solid;
+    align-items: center;
+    flex-direction: column;
+">
+    <div style="
+    justify-content: space-between;
+    display: flex;
+    align-items: center;
+    width: 90%;
+">
+        <form style="
+    display: flex;
+    flex-direction: column;
+"> 
+                <!-- <label><input name="srcType" type="radio" onclick="removeEvent()" value="4" checked>EC Code</label> 
+                <label><input name="srcType" type="radio" onclick="addEvent()" value="1">Gameshark v1/v2 </label> 
+                <label><input name="srcType" type="radio" onclick="addEvent()" value="3">Gameshark v3 </label> 
+                <label><input name="srcType" type="radio" onclick="addEvent()" value="2">VBA(direct)</label> -->
+                <label><input name="srcType" type="radio"  value="4" checked>EC Code</label> 
+                <label><input name="srcType" type="radio"  value="1">Gameshark v1/v2 </label> 
+                <label><input name="srcType" type="radio"  value="3">Gameshark v3 </label> 
+                <label><input name="srcType" type="radio"  value="2">VBA(direct)</label>
+        </form> 
+        <button onclick="convert()" id="convert" style="
+    width: 25%;
+    height: 45px;
+">转换到</button>
+        <form style="
+    display: flex;
+    flex-direction: column;
+"> 
+                <label><input name="dstType" type="radio" value="2" checked>VBA(direct)</label>
+                <label><input name="dstType" type="radio" value="1">Gameshark v1/v2 </label> 
+                <label><input name="dstType" type="radio" value="3">Gameshark v3 </label> 
+        </form> 
+    </div>
+    <div style="
+        display: block;
+        width: 90%;
+        ">
+        <h3>使用说明：</h3>
+        <p>1.该转换器是ReGBA模拟器金手指代码的专用转换器，支持EC、GS、VBA代码的互相转换。</p>
+        <p>2.更新到v1.1版本，支持EC整个文件转换为ReGBA金手指代码及编码样例展示。</p>
+        <p>3.转换前请注意输入区的格式，不了解格式请点击下方按钮查看样例。</p>
+        <div style="
+        display: flex;
+        justify-content: space-around;
+        "><button onclick="viewExample(1)">查看EC样例</button>
+            <button onclick="viewExample(2)">查看GS样例</button>
+            <button onclick="viewExample(3)">查看VBA样例</button>
+        </div>
+    </div>
+    
+
+
+    </div>
+    <div id="dstbox" style="
+    width: 30%;
+    height: 90%;
+    border: 1px solid;
+">
+        <textarea id="dstEditBox" style="margin: 0px;width: 100%;height: 100%;" readonly="readonly"></textarea>
+        <button onclick="Copy2CB(this);">点击复制</button>
+    </div>
+</div>
+    <script>
+        var viewExample = function(type){
+            var srcTypes = document.getElementsByName("srcType"); 
+            var dstTypes = document.getElementsByName("dstType"); 
+            switch(type){
+                case 1:
+                    srcTypes[0].checked = true;
+                    dstTypes[0].checked = true;
+                    srcEditBox.value = "\[购物点数\]\nON=44DB4,FF,FF\n\[全人物+隐藏要素开启\]\nON=44D58,FF,FF,FF,FF,FF,FF,FF,FF\n\[我方体力\]\nON=4273E,FF\n\[我方最大体力\]\nON=4273F,FF\n\[我方气量\]\nON=4274B,64\n\[选人\]\n孙悟空LV1=42738,0;450B0,0\n孙悟空LV2=42738,1;450B0,1\n孙悟饭LV1=42738,3;450B0,3\n孙悟饭LV2=42738,4;450B0,4"
+                    break
+                case 2:
+                    srcTypes[1].checked = true;
+                    dstTypes[0].checked = true;
+                    srcEditBox.value = "gameshark_v1 我方体力\nD67AB3C7 EF62E8AF\ngameshark_v1 我方气量\n769CC583 F90E5F7F"
+                    break
+                case 3:
+                    srcTypes[3].checked = true;
+                    dstTypes[1].checked = true;
+                    srcEditBox.value = "direct_v1 我方体力\n0204273E 000000FF\ndirect_v1 我方气量\n0204274B 00000064"
+                    break
+            }
+        }
+
+        var removeEvent = function(){
+            srcEditBox = document.getElementById("srcEditBox");
+            //srcEditBox.removeEventListener('onkeyup', function (e) {
+            //    e.value=e.value.replace(/[^a-fA-F0-9,; \n]/g,'');
+            //}, false);
+            srcEditBox.onkeyup = null
+        }
+
+        var addEvent = function(){
+            srcEditBox = document.getElementById("srcEditBox");
+            //srcEditBox.addEventListener('onkeyup',format,false);
+            srcEditBox.value=srcEditBox.value.replace(/[^a-fA-F0-9 \n]/g,'');
+            srcEditBox.onkeyup = function(){
+                this.value=this.value.replace(/[^a-fA-F0-9 \n]/g,'');
+            }
+        }
+
+        var pad = function (num, size) {
+            var s = "000000000" + num;
+            return s.substr(s.length - size);
+        }
+
+
+        var wrap32 = function (input) {
+            if (input < 0) {
+                input += 0x100000000;
+            }
+            if (input > 0xFFFFFFFF) {
+                input -= 0x100000000;
+            }
+
+            return input;
+        };
+
+        var convert_gs_to_vba = function (address, value, version) {
+
+            var r = 0xC6EF3720;
+            var rsa = 0x9E3779B9;
+
+            var s = [0x09F4FBBD,0x9681884A,0x352027E9,0xF3DEE5A7];
+
+            if (version == 3) {
+                s = [0x7AA9648F,0x7FAE6994,0xC0EFAAD5,0x42712C57];
+            }
+
+            var t = 0,
+                t2 = 0;
+
+            for (var i = 0; i < 32; i++) {
+                t = (address << 4) & 0xFFFFFFFF;
+                t = wrap32(t);
+
+                t += s[2];
+                t = wrap32(t);
+
+                t2 = address + r;
+                t2 = wrap32(t2);
+
+                t ^= t2;
+                t = wrap32(t);
+
+                t2 = (address >> 5) & 0x07FFFFFF;
+                t2 = wrap32(t2);
+
+                t2 += s[3];
+                t2 = wrap32(t2);
+
+                t ^= t2;
+                t = wrap32(t);
+
+                value -= t;
+                value = wrap32(value);
+
+                t = (value << 4) & 0xFFFFFFFF;
+                t = wrap32(t);
+
+                t += s[0];
+                t = wrap32(t);
+
+                t2 = value + r;
+                t2 = wrap32(t2);
+
+                t ^= t2;
+                t = wrap32(t);
+
+                t2 = (value >> 5) & 0x07FFFFFF;
+                t2 = wrap32(t2);
+
+                t2 += s[1];
+                t2 = wrap32(t2);
+
+                t ^= t2;
+                t = wrap32(t);
+
+                address -= t;
+                address = wrap32(address);
+
+                r -= rsa;
+                r = wrap32(r);
+            }
+            return (pad(address.toString(16).toUpperCase(), 8) + " " + pad(value.toString(16).toUpperCase(), 8));
+        }
+
+
+        var convert_vba_to_gs = function (address, value, version) {
+            var r = 0x00000000;
+            var rsa = 0x9E3779B9;
+
+            var s = [0x09F4FBBD,0x9681884A,0x352027E9,0xF3DEE5A7];
+
+            if (version == 3) {
+                s = [0x7AA9648F,0x7FAE6994,0xC0EFAAD5,0x42712C57];
+            }
+
+            var t = 0;
+            var t2 = 0;
+
+            for (var i = 0; i < 32; i++) {
+                r += rsa;
+                r = wrap32(r);
+
+                t = (value << 4) & 0xFFFFFFFF;
+                t = wrap32(t);
+
+                t += s[0];
+                t = wrap32(t);
+
+                t2 = value + r;
+                t2 = wrap32(t2);
+
+                t ^= t2;
+                t = wrap32(t);
+
+                t2 = (value >> 5) & 0x07FFFFFF;
+                t2 = wrap32(t2);
+
+                t2 += s[1];
+                t2 = wrap32(t2);
+
+                t ^= t2;
+                t = wrap32(t);
+
+                address += t;
+                address = wrap32(address);
+
+                t = (address << 4) & 0xFFFFFFFF;
+                t = wrap32(t);
+
+                t += s[2];
+                t = wrap32(t);
+
+                t2 = address + r;
+                t2 = wrap32(t2);
+
+                t ^= t2;
+                t = wrap32(t);
+
+                t2 = (address >> 5) & 0x07FFFFFF;
+                t2 = wrap32(t2);
+
+                t2 += s[3];
+                t2 = wrap32(t2);
+
+                t ^= t2;
+                t = wrap32(t);
+
+                value += t;
+                value = wrap32(value);
+            }
+            return (pad(address.toString(16).toUpperCase(), 8) + " " + pad(value.toString(16).toUpperCase(), 8));
+        };
+
+        var convert_ec_to_vba= function(eccode){
+            var lines= new Array();
+            lines=eccode.split("\n");
+            eccode = lines[0]
+            var retstr = ""
+            var baseaddr = 0x2000000
+            var codes= new Array();
+            codes=eccode.split(";");
+            for (i=0;i<codes.length ;i++ ) 
+            {
+                var values= new Array();
+                values = codes[i].split(",");
+                var offset = parseInt(values[0],16);
+                for(var j = 1;j < values.length;j++){
+                    var firstbit;
+                    var val = values[j];
+                    if(val.length<=2){
+                        firstbit = 0
+                    }else if(val.length<=4){
+                        firstbit = 0x10000000
+                    }else if(val.length<=6){
+                        firstbit = 0x20000000
+                    }else if(val.length<=8){
+                        firstbit = 0x30000000
+                    }
+                    address =  firstbit + baseaddr + offset
+                    retstr += pad(address.toString(16),8).toUpperCase() + " " + pad(val,8).toUpperCase() + "\n";
+
+
+                    if(val.length<=2){
+                        offset += 1;
+                    }else if(val.length<=4){
+                        offset += 2;
+                    }else if(val.length<=6){
+                        offset += 3;
+                    }else if(val.length<=8){
+                        offset += 4;
+                    }
+                }  
+            }
+            return retstr;
+        }
+
+
+        var Copy2CB = function(ElementObj){
+         var inputElement =  document.getElementById("dstEditBox");
+         inputElement.select();
+         document.execCommand("Copy");
+         ElementObj.innerText = "转换内容已复制"
+         setTimeout(function(){
+            ElementObj.innerText = "点击复制"
+         },2000)
+        }
+
+		var parseINIString = function(data){
+		  var regex = {
+			section: /^\s*\[\s*([^]*)\s*\]\s*$/,
+			param: /^\s*([^]+)\s*=\s*(.*?)\s*$/,
+			comment: /^\s*;.*$/
+		  };
+		  var value = {};
+		  var lines = data.split(/\r\n|\r|\n/);
+		  var section = null;
+		  lines.forEach(function(line){
+			if(regex.comment.test(line)){
+			  return;
+			}else if(regex.param.test(line)){
+			  var match = line.match(regex.param);
+			  if(section){
+				value[section][match[1]] = match[2];
+			  }else{
+				value[match[1]] = match[2];
+			  }
+			}else if(regex.section.test(line)){
+			  var match = line.match(regex.section);
+			  value[match[1]] = {};
+			  section = match[1];
+			}else if(line.length == 0 && section){
+              //section = null;  //注释掉防止column之间有换行不能识别，但是这样section名称不能有等于号=
+			};
+		  });
+		  return value;
+		}
+
+
+        var convert = function(){
+            var srcText = document.getElementById("srcEditBox")
+            var dstText = document.getElementById("dstEditBox")
+            dstText.value = ""
+            //alert(srcText.innerHTML)
+            var srcType;
+            var dstType;
+
+            var srcTypes = document.getElementsByName("srcType"); 
+            var dstTypes = document.getElementsByName("dstType");
+
+            for(i=0;i<srcTypes.length;i++) 
+            { 
+                obj = srcTypes[i]; 
+                type = obj.getAttribute("type"); 
+                name = obj.getAttribute("name"); 
+                if(type=="radio"&&obj.checked) 
+                { 
+                    srcType = obj.getAttribute("value");
+                } 
+            } 
+
+            for(i=0;i<dstTypes.length;i++) 
+            { 
+                obj = dstTypes[i]; 
+                type = obj.getAttribute("type"); 
+                name = obj.getAttribute("name"); 
+                if(type=="radio"&&obj.checked) 
+                { 
+                    dstType = obj.getAttribute("value");
+                } 
+            } 
+
+            if(srcType == undefined){
+                alert("请先选择要转换的编码类型！")
+                return
+            }
+            if(dstType == undefined){
+                alert("请先选择转换后的编码类型！")
+                return
+            }
+
+            if(srcType == dstType){
+                alert("一样的类型还需要转啥。。。")
+                return
+            }
+
+            if(srcType == 1 && dstType == 2){
+                //gs1/2 to vba
+                var lines= new Array(); 
+                lines = srcText.value.split("\n")
+                for(var i=0;i<lines.length;i++){
+                    if(lines[i] == ""){
+                        continue
+                    }
+                    if(lines[i].indexOf("gameshark_") != -1){
+                        str = lines[i].replace("gameshark","direct")
+                        if(i!=0){
+                            dstText.value += '\n' + str + '\n'
+                        }else{
+                            dstText.value += str + '\n'
+                        }
+                        continue
+                    }
+                    var line= new Array();
+                    line = lines[i].split(" ")
+                    var address = parseInt(line[0],16)
+                    var value = parseInt(line[1],16)
+                    if(address == NaN || value==NaN || address ==undefined || value == undefined){
+                        dstText.value += '\n'
+                    }else{
+                        var s = convert_gs_to_vba(address,value,1)
+                        if(s.indexOf("NAN") != -1){
+                            dstText.value += '\n'
+                        }else{
+                            dstText.value += s
+                            dstText.value += '\n'
+                        }
+                    }
+                }
+            }else if(srcType == 1 && dstType == 3){
+                //gs1/2 to gs3
+                var lines= new Array(); 
+                lines = srcText.value.split("\n")
+                for(var i=0;i<lines.length;i++){
+                    if(lines[i] == ""){
+                        continue
+                    }
+                    if(lines[i].indexOf("gameshark_") != -1){
+                        str = lines[i].replace("_v1","_v3")
+                        if(i!=0){
+                            dstText.value += '\n' + str + '\n'
+                        }else{
+                            dstText.value += str + '\n'
+                        }
+                        continue
+                    }
+                    var line= new Array();
+                    line = lines[i].split(" ")
+                    var address = parseInt(line[0],16)
+                    var value = parseInt(line[1],16)
+                    if(address == NaN || value==NaN || address ==undefined || value == undefined){
+                        dstText.value += '\n'
+                    }else{
+                        var s = convert_gs_to_vba(address,value,1)
+                        if(s.indexOf("NAN") != -1){
+                            dstText.value += '\n'
+                        }else{
+                            line = s.split(" ")
+                            var vba_address = parseInt(line[0],16)
+                            var vba_value = parseInt(line[1],16)
+                            dstText.value += convert_vba_to_gs(vba_address,vba_value,3)
+                            dstText.value += '\n'
+                        }
+                    }
+                }
+            }else if(srcType == 2 && dstType == 1){
+                //vba to gs1/2
+                var lines= new Array(); 
+                lines = srcText.value.split("\n")
+                for(var i=0;i<lines.length;i++){
+                    if(lines[i] == ""){
+                        continue
+                    }
+                    if(lines[i].indexOf("direct_") != -1){
+                        str = lines[i].replace("direct","gameshark")
+                        if(i!=0){
+                            dstText.value += '\n' + str + '\n'
+                        }else{
+                            dstText.value += str + '\n'
+                        }
+                        continue
+                    }
+                    var line= new Array();
+                    line = lines[i].split(" ")
+                    var address = parseInt(line[0],16)
+                    var value = parseInt(line[1],16)
+                    if(address == NaN || value==NaN || address ==undefined || value == undefined){
+                        dstText.value += '\n'
+                    }else{
+                        var s = convert_vba_to_gs(address,value,1)
+                        if(s.indexOf("NAN") != -1){
+                            dstText.value += '\n'
+                        }else{
+                            dstText.value += s
+                            dstText.value += '\n'
+                        }
+                    }
+                }
+            }else if(srcType == 2 && dstType == 3){
+                //vba to gs3
+                var lines= new Array(); 
+                lines = srcText.value.split("\n")
+                for(var i=0;i<lines.length;i++){
+                    if(lines[i] == ""){
+                        continue
+                    }
+                    if(lines[i].indexOf("direct_") != -1){
+                        str = lines[i].replace("direct_v1","gameshark_v3")
+                        if(i!=0){
+                            dstText.value += '\n' + str + '\n'
+                        }else{
+                            dstText.value += str + '\n'
+                        }
+                        continue
+                    }
+                    var line= new Array();
+                    line = lines[i].split(" ")
+                    var address = parseInt(line[0],16)
+                    var value = parseInt(line[1],16)
+                    if(address == NaN || value==NaN || address ==undefined || value == undefined){
+                        dstText.value += '\n'
+                    }else{
+                        var s = convert_vba_to_gs(address,value,3)
+                        if(s.indexOf("NAN") != -1){
+                            dstText.value += '\n'
+                        }else{
+                            dstText.value += s
+                            dstText.value += '\n'
+                        }
+                    }
+                }
+                
+            }else if(srcType == 3 && dstType == 1){
+                //gs3 to gs1/2 
+                var lines= new Array(); 
+                lines = srcText.value.split("\n")
+                for(var i=0;i<lines.length;i++){
+                    if(lines[i] == ""){
+                        continue
+                    }
+                    if(lines[i].indexOf("gameshark_") != -1){
+                        str = lines[i].replace("gameshark_v3","gameshark_v1")
+                        if(i!=0){
+                            dstText.value += '\n' + str + '\n'
+                        }else{
+                            dstText.value += str + '\n'
+                        }
+                        continue
+                    }
+                    var line= new Array();
+                    line = lines[i].split(" ")
+                    var address = parseInt(line[0],16)
+                    var value = parseInt(line[1],16)
+                    if(address == NaN || value==NaN || address ==undefined || value == undefined){
+                        dstText.value += '\n'
+                    }else{
+                        var s = convert_gs_to_vba(address,value,3)
+                        if(s.indexOf("NAN") != -1){
+                            dstText.value += '\n'
+                        }else{
+                            line = s.split(" ")
+                            var vba_address = parseInt(line[0],16)
+                            var vba_value = parseInt(line[1],16)
+                            dstText.value += convert_vba_to_gs(vba_address,vba_value,1)
+                            dstText.value += '\n'
+                        }
+                    }
+                }
+            }else if(srcType == 3 && dstType == 2){
+                //gs3 to vba 
+                var lines= new Array(); 
+                lines = srcText.value.split("\n")
+                for(var i=0;i<lines.length;i++){
+                    if(lines[i] == ""){
+                        continue
+                    }
+                    if(lines[i].indexOf("gameshark_") != -1){
+                        str = lines[i]
+                        if(i!=0){
+                            dstText.value += '\n' + str + '\n'
+                        }else{
+                            dstText.value += str + '\n'
+                        }
+                        continue
+                    }
+                    var line= new Array();
+                    line = lines[i].split(" ")
+                    var address = parseInt(line[0],16)
+                    var value = parseInt(line[1],16)
+                    if(address == NaN || value==NaN || address ==undefined || value == undefined){
+                        dstText.value += '\n'
+                    }else{
+                        var s = convert_gs_to_vba(address,value,3)
+                        if(s.indexOf("NAN") != -1){
+                            dstText.value += '\n'
+                        }else{
+                            dstText.value += s
+                            dstText.value += '\n'
+                        }
+                    }
+                }
+            }else if(srcType == 4 && dstType == 1){
+                //EC to gs1/2 
+                var iniJson = parseINIString(srcText.value)
+                for (var blkname in iniJson){
+                    if(blkname.toUpperCase() == "GAMEINFO"){
+                        continue;
+                    }
+
+                    for(var colname in iniJson[blkname]){
+                        if(colname != "ON"){
+                            var name = blkname + ' ' + colname
+                        }else{
+                            var name = blkname
+                        }
+                        var value = iniJson[blkname][colname]
+                        dstText.value += "gameshark_v1 " + name + '\n'
+                        vba_lines = convert_ec_to_vba(value);
+                        var vbalines= new Array(); 
+                        vbalines = vba_lines.split("\n")
+                        for(var i=0;i<vbalines.length;i++){
+                            var line= new Array();
+                            line = vbalines[i].split(" ")
+                            if(line.length == 2){
+                                var address = parseInt(line[0],16)
+                                var value = parseInt(line[1],16)
+                                var s = convert_vba_to_gs(address,value,1)
+                                dstText.value += s
+                                dstText.value += '\n'
+                            }
+                        }
+                        dstText.value += "\n"
+                    }
+                }
+            }else if(srcType == 4 && dstType == 2){
+                //EC to vba
+                console.log(parseINIString(srcText.value))
+                var iniJson = parseINIString(srcText.value)
+                for (var blkname in iniJson){
+                    if(blkname.toUpperCase() == "GAMEINFO"){
+                        continue;
+                    }
+
+                    for(var colname in iniJson[blkname]){
+                        if(colname != "ON"){
+                            var name = blkname + ' ' + colname
+                        }else{
+                            var name = blkname
+                        }
+                        var value = iniJson[blkname][colname]
+                        var lines = ""
+                        lines += "direct_v1 " + name + '\n'
+                        lines += convert_ec_to_vba(value);
+                        lines += "\n"
+                        dstText.value += lines
+                    }
+                }
+            }else if(srcType == 4 && dstType == 3){
+                //EC to gs3
+                var iniJson = parseINIString(srcText.value)
+                for (var blkname in iniJson){
+                    if(blkname.toUpperCase() == "GAMEINFO"){
+                        continue;
+                    }
+
+                    for(var colname in iniJson[blkname]){
+                        if(colname != "ON"){
+                            var name = blkname + ' ' + colname
+                        }else{
+                            var name = blkname
+                        }
+                        var value = iniJson[blkname][colname]
+                        dstText.value += "gameshark_v3 " + name + '\n'
+                        vba_lines = convert_ec_to_vba(value);
+                        var vbalines= new Array(); 
+                        vbalines = vba_lines.split("\n")
+                        for(var i=0;i<vbalines.length;i++){
+                            var line= new Array();
+                            line = vbalines[i].split(" ")
+                            if(line.length == 2){
+                                var address = parseInt(line[0],16)
+                                var value = parseInt(line[1],16)
+                                var s = convert_vba_to_gs(address,value,3)
+                                dstText.value += s
+                                dstText.value += '\n'
+                            }
+                        }
+                        dstText.value += "\n"
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

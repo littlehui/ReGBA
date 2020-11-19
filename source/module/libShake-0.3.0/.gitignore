@@ -1,0 +1,8 @@
+*~
+*.o
+*.so
+*.elf
+obj/
+.*
+!/.gitignore
+*.dylib

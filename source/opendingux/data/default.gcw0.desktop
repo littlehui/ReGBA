@@ -1,0 +1,12 @@
+[Desktop Entry]
+
+Name=ReGBA中文版
+Comment=带金手指,滤镜的中文GBA模拟器
+X-OD-Manual=manual-en.txt
+Icon=regba-silver
+Exec=regba %f
+Terminal=false
+Type=Application
+StartupNotify=true
+Categories=emulators;
+MimeType=application/x-gba-rom;application/zip;
